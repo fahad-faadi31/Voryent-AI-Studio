@@ -1,12 +1,12 @@
 ﻿"""
 User model for Voryent AI Studio.
-
-This model maps to the `users` table in PostgreSQL.
 """
 
 from __future__ import annotations
 
-from sqlalchemy import Boolean, DateTime, String, func
+import uuid
+
+from sqlalchemy import Boolean, DateTime, String, Uuid, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.sql import text
 
@@ -18,7 +18,8 @@ class User(Base):
 
     __tablename__ = "users"
 
-    id: Mapped[str] = mapped_column(
+    id: Mapped[uuid.UUID] = mapped_column(
+        Uuid,
         primary_key=True,
         server_default=text("gen_random_uuid()"),
         nullable=False,

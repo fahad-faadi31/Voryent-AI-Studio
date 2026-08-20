@@ -1,10 +1,10 @@
 ﻿"""
 Job model for Voryent AI Studio.
-
-This model maps to the `jobs` table in PostgreSQL.
 """
 
 from __future__ import annotations
+
+import uuid
 
 from sqlalchemy import (
     BigInteger,
@@ -14,6 +14,7 @@ from sqlalchemy import (
     Index,
     String,
     Text,
+    Uuid,
     func,
     text,
 )
@@ -27,13 +28,15 @@ class Job(Base):
 
     __tablename__ = "jobs"
 
-    id: Mapped[str] = mapped_column(
+    id: Mapped[uuid.UUID] = mapped_column(
+        Uuid,
         primary_key=True,
         server_default=text("gen_random_uuid()"),
         nullable=False,
     )
 
-    user_id: Mapped[str] = mapped_column(
+    user_id: Mapped[uuid.UUID] = mapped_column(
+        Uuid,
         ForeignKey("users.id", ondelete="CASCADE"),
         nullable=False,
     )
