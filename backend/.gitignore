@@ -17,3 +17,4 @@ htmlcov/
 *.sqlite3
 
 docker-compose.override.yml
+storage/
