@@ -10,6 +10,11 @@ from __future__ import annotations
 
 from sqlalchemy.orm import Session
 
+from app.core.exceptions import (
+    DuplicateEmailError,
+    InactiveUserError,
+    InvalidCredentialsError,
+)
 from app.core.security import (
     create_access_token,
     hash_password,
@@ -56,27 +61,3 @@ class AuthService:
             raise InactiveUserError("User account is inactive.")
 
         return create_access_token(str(user.id))
-
-
-class DuplicateEmailError(Exception):
-    """Raised when attempting to register with an existing email."""
-
-    def __init__(self, message: str = "Email is already registered."):
-        self.message = message
-        super().__init__(self.message)
-
-
-class InvalidCredentialsError(Exception):
-    """Raised when login credentials are invalid."""
-
-    def __init__(self, message: str = "Invalid email or password."):
-        self.message = message
-        super().__init__(self.message)
-
-
-class InactiveUserError(Exception):
-    """Raised when a user account is inactive."""
-
-    def __init__(self, message: str = "User account is inactive."):
-        self.message = message
-        super().__init__(self.message)

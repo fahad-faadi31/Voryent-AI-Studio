@@ -17,58 +17,30 @@ class UserRepository:
     """Repository for User database operations."""
 
     def __init__(self, db: Session):
-        """
-        Initialize the repository with a SQLAlchemy Session.
-
-        Args:
-            db: SQLAlchemy Session for database operations.
-        """
+        """Initialize the repository with a SQLAlchemy Session."""
         self.db = db
 
     def get_by_email(self, email: str) -> User | None:
-        """
-        Fetch a user by their email address.
-
-        Args:
-            email: The user's email address (case-sensitive).
-
-        Returns:
-            The User object if found, otherwise None.
-        """
+        """Fetch a user by email address."""
         stmt = select(User).where(User.email == email)
         result = self.db.execute(stmt)
         return result.scalar_one_or_none()
 
     def get_by_id(self, user_id: str) -> User | None:
-        """
-        Fetch a user by their ID.
-
-        Args:
-            user_id: The user's UUID as a string.
-
-        Returns:
-            The User object if found, otherwise None.
-        """
+        """Fetch a user by UUID."""
         stmt = select(User).where(User.id == user_id)
         result = self.db.execute(stmt)
         return result.scalar_one_or_none()
 
     def create_user(self, email: str, hashed_password: str) -> User:
-        """
-        Create a new user in the database.
-
-        Args:
-            email: The user's email address.
-            hashed_password: The bcrypt-hashed password.
-
-        Returns:
-            The newly created User object with its database-generated ID.
-        """
+        """Create and persist a new user."""
         user = User(
             email=email,
             hashed_password=hashed_password,
         )
+
         self.db.add(user)
-        self.db.flush()
+        self.db.commit()
         self.db.refresh(user)
+
         return user
