@@ -4,15 +4,13 @@ Background worker for Voryent AI Studio.
 
 from __future__ import annotations
 
-import io
 import logging
 import time
 from uuid import UUID
 
-from PIL import Image, ImageDraw
-
 from app.db.session import SessionLocal
 from app.services.job_service import JobService
+from app.services.model_service import get_model_service
 from app.services.queue_service import QueueService
 from app.services.storage_service import StorageService
 
@@ -24,63 +22,6 @@ logging.basicConfig(
 )
 
 logger = logging.getLogger("voryent.worker")
-
-
-def generate_mock_image(
-    prompt: str,
-    aspect_ratio: str,
-    seed: int | None,
-) -> bytes:
-    """Generate a temporary mock PNG image."""
-
-    dimensions = {
-        "1:1": (512, 512),
-        "16:9": (640, 360),
-        "9:16": (360, 640),
-    }
-
-    width, height = dimensions.get(aspect_ratio, (512, 512))
-
-    if seed is not None:
-        import hashlib
-
-        hash_value = hashlib.md5(str(seed).encode()).hexdigest()
-
-        r = int(hash_value[0:2], 16)
-        g = int(hash_value[2:4], 16)
-        b = int(hash_value[4:6], 16)
-    else:
-        r, g, b = 100, 150, 200
-
-    image = Image.new(
-        "RGB",
-        (width, height),
-        color=(r, g, b),
-    )
-
-    draw = ImageDraw.Draw(image)
-
-    border_width = 4
-
-    draw.rectangle(
-        [
-            border_width,
-            border_width,
-            width - border_width - 1,
-            height - border_width - 1,
-        ],
-        outline=(255, 255, 255),
-        width=border_width,
-    )
-
-    buffer = io.BytesIO()
-
-    image.save(
-        buffer,
-        format="PNG",
-    )
-
-    return buffer.getvalue()
 
 
 def process_job(job_id_str: str) -> None:
@@ -111,12 +52,14 @@ def process_job(job_id_str: str) -> None:
             job_id,
         )
 
+        model_service = get_model_service()
+
         logger.info(
-            "Generating mock image for job %s",
+            "Generating image for job %s",
             job_id,
         )
 
-        image_data = generate_mock_image(
+        image_data = model_service.generate(
             prompt=job.prompt,
             aspect_ratio=job.aspect_ratio,
             seed=job.seed,

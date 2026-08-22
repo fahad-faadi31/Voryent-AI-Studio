@@ -46,6 +46,14 @@ class Settings(BaseSettings):
     REDIS_URL: str = "redis://localhost:6379/0"
 
     # ------------------------------------------------------------------
+    # Model / Image Generation
+    # ------------------------------------------------------------------
+    MODEL_PROVIDER: str = "mock"
+    MODEL_ID: str = ""
+    MODEL_VERSION: str = ""
+    REPLICATE_API_TOKEN: str | None = None
+
+    # ------------------------------------------------------------------
     # CORS
     # ------------------------------------------------------------------
     CORS_ORIGINS: list[str] = Field(
